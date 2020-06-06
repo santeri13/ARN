@@ -1,7 +1,6 @@
 package com.example.narva;
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -11,9 +10,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.LinearLayout;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -39,7 +36,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
@@ -66,34 +62,35 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
     LocationRequest mLocationRequest;
     Location mLastLocation;
     Marker mCurrLocationMarker;
-    LatLng latLng,lion,prom,plats;
-    MarkerOptions lionmarker,prommarker,platsmarker, markerOptions1;
+    LatLng latLng;
+    MarkerOptions lionmarker, markerOptions1;
     private Polyline currentPolyline;
     double latitude, longtitude;
     double end_latitude,end_longtitude;
     TextView textTitle,points;
-    ArrayList arrayList;
-    DatabaseReference mreference;
+    DatabaseReference mreference,database,reference;
     String title;
     RecyclerView recyclerView;
     private List<PointReader> artistList;
     private PointAdapter adapter;
     String uid;
-    DatabaseReference database;
+    int pathindicator;
+    List<Double> latitudearraylist,longtitudearraylist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map);
-        Window g = getWindow();
-        g.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.TYPE_STATUS_BAR);
         Intent i = getIntent();
+        hideNavigationBan();
         points = (TextView)findViewById(R.id.points);
         title = i.getStringExtra("title");
         textTitle = findViewById(R.id.tour_text);
         textTitle.setText(title);
         mreference = FirebaseDatabase.getInstance().getReference().child("Tours").child(title).child("MainCoordinates");
         mreference.keepSynced(true);
+        reference = FirebaseDatabase.getInstance().getReference().child("Tours").child(title).child("SubCoordinates");
+        reference.keepSynced(true);
         mreference.addValueEventListener(valueEventListener);
         recyclerView = (RecyclerView)findViewById(R.id.setpath);
         recyclerView.setHasFixedSize(true);
@@ -103,15 +100,11 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         artistList = new ArrayList<>();
         adapter = new PointAdapter(this,artistList);
         recyclerView.setAdapter(adapter);
-        lionmarker = new MarkerOptions().position(new LatLng(59.373015, 28.200559)).title("Swedish lion statue in Narva");
-        prommarker = new MarkerOptions().position(new LatLng(59.377580, 28.203154)).title("Narva Promenaad");
-        platsmarker = new MarkerOptions().position(new LatLng(59.379110, 28.198908)).title("Raekoja plats");
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         initGoogleAPIClient();
         checkPermissions();
-
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         uid = user.getUid();
         database = FirebaseDatabase.getInstance().getReference();
@@ -119,6 +112,7 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         if (user.isAnonymous()) {
             points.setText("0");
         }
+
         else{
             database.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -135,7 +129,6 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
             });
         }
     }
-
     ValueEventListener valueEventListener = (new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -234,7 +227,6 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         });
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -253,10 +245,7 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                 break;
         }
     }
-
     /* Broadcast receiver to check status of GPS */
-
-
     /* On Request permission method to check the permisison is granted or not for Marshmallow+ Devices  */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -303,89 +292,62 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
             Log.e("Gps","Cant find style");
         }
         mMap.setMaxZoomPreference(17.0f);
-            lion = new LatLng(59.372404, 28.200153);
-            prom = new LatLng(59.377580, 28.203154);
-            end_latitude = prom.latitude;
-            end_longtitude = prom.longitude;
-            plats = new LatLng(59.379110, 28.198908);
-            mMap.addMarker(lionmarker);
-            mMap.addMarker(prommarker);
-            mMap.addMarker(platsmarker);
-            mMap.addPolyline(new PolylineOptions().add(
-                    lion,
-                    new LatLng(59.373015, 28.200559),
+        mreference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                latitudearraylist = new ArrayList<>();
+                longtitudearraylist = new ArrayList<>();
+                for(DataSnapshot child: dataSnapshot.getChildren()){
+                    double latitude = child.child("latitude").getValue(Double.class);
+                    double longtitude = child.child("longtitude").getValue(Double.class);
+                    latitudearraylist.add(latitude);
+                    longtitudearraylist.add(longtitude);
+                    String name = child.child("name").getValue(String.class);
+                    LatLng cod = new LatLng(latitude,longtitude);
+                    mMap.addMarker(new MarkerOptions().position(cod).title(name));
+                }
+            }
 
-                    new LatLng(59.372404, 28.200153),
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    new LatLng(59.372351, 28.200274),
+            }
+        });
+        mreference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    double latitude = dataSnapshot.child("Coordinate1").child("latitude").getValue(Double.class);
+                    double longtitude = dataSnapshot.child("Coordinate1").child("longtitude").getValue(Double.class);
+                    String name = dataSnapshot.child("name").getValue(String.class);
+                    LatLng cod = new LatLng(latitude,longtitude);
+                    lionmarker = new MarkerOptions().position(cod).title(name);
+            }
 
-                    new LatLng(59.372324, 28.200365),
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    new LatLng(59.372296, 28.200473),
+            }
+        });
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                PolylineOptions polylineOptions = new PolylineOptions();
+                polylineOptions.color(Color.MAGENTA);
+                polylineOptions.width(10);
+                for(DataSnapshot child: dataSnapshot.getChildren()){
+                    double latitude = child.child("latitude").getValue(Double.class);
+                    double longtitude = child.child("longtitude").getValue(Double.class);
+                    polylineOptions.add(new LatLng(latitude,longtitude));
+                }
+                mMap.addPolyline(polylineOptions);
+            }
 
-                    new LatLng(59.372293, 28.200580),
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    new LatLng(59.372283, 28.200752),
-
-                    new LatLng(59.372422, 28.200693),
-
-                    new LatLng(59.372624, 28.200773),
-
-                    new LatLng(59.372884, 28.201009),
-
-                    new LatLng(59.373212, 28.201108),
-
-                    new LatLng(59.374442, 28.201466),
-
-                    new LatLng(59.375224, 28.202039),
-
-                    new LatLng(59.377358, 28.202929),
-
-                    prom)
-
-                    .width(10)
-
-                    .color(Color.MAGENTA)
-            );
-            mMap.addPolyline(new PolylineOptions().add(
-
-                    prom,
-                    new LatLng(59.377358, 28.202929),
-
-                    new LatLng(59.376870, 28.202709),
-
-                    new LatLng(59.376916, 28.202183),
-
-                    new LatLng(59.377263, 28.202210),
-
-                    new LatLng(59.377345, 28.202505),
-
-                    new LatLng(59.377683, 28.202811),
-
-                    new LatLng(59.377802, 28.202639),
-
-                    new LatLng(59.378003, 28.202776),
-
-                    new LatLng(59.378019, 28.202711),
-
-                    new LatLng(59.378291, 28.201186),
-
-                    new LatLng(59.378353, 28.199758),
-
-                    new LatLng(59.378395, 28.198703),
-
-                    new LatLng(59.378708, 28.198875),
-
-                    plats)
-
-                    .width(10)
-
-                    .color(Color.BLUE)
-
-
-
-            );
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.373062, 28.200594), 15),5000,null);
+            }
+        });
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.373062, 28.200594), 15),5000,null);
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -436,29 +398,38 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
+        pathindicator =0;
         TextView textView = findViewById(R.id.meters);
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
-        //Place current location marker
-        latLng = new LatLng(location.getLatitude(), location.getLongitude());
         latitude = location.getLatitude();
         longtitude = location.getLongitude();
-        markerOptions1 = new MarkerOptions().position( new LatLng (location.getLatitude(), location.getLongitude())).title("Current Position");
-        markerOptions1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        new FetchURL(Gps.this).execute(getUrl(markerOptions1.getPosition(), lionmarker.getPosition(), "walking"), "walking");
-        float result[] = new float[1];
-        Location.distanceBetween(latitude,longtitude,end_latitude,end_longtitude,result);
-        for(int i = 0, n = result.length; i <n ;i++){
-            textView.setText((int) result[i]+"m");
-            if(result[i]<=50){
-                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker) {
-                        Unity();
-                        return false;
-                    }
-                });
+        if(pathindicator+1 > latitudearraylist.size()){
+
+        }
+        else{
+            end_latitude = latitudearraylist.get(pathindicator);
+            end_longtitude = longtitudearraylist.get(pathindicator);
+            //Place current location marker
+            latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            markerOptions1 = new MarkerOptions().position( new LatLng (location.getLatitude(), location.getLongitude()));
+            new FetchURL(Gps.this).execute(getUrl(markerOptions1.getPosition(), lionmarker.getPosition(), "walking"), "walking");
+            float result[] = new float[1];
+            Location.distanceBetween(latitude,longtitude,end_latitude,end_longtitude,result);
+            Log.d("TAG","latitude"+ end_latitude);
+            Log.d("TAG","longtitude"+end_longtitude);
+            for(int i = 0, n = result.length; i <n ;i++){
+                textView.setText((int) result[i]+"m");
+                if(result[i]<=50){
+                    mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker) {
+                            pathindicator = pathindicator +1;
+                            return false;
+                        }
+                    });
+                }
             }
         }
 
@@ -523,13 +494,28 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
+        hideNavigationBan();
     }
-
     @Override
     public void onTaskDone(Object... values) {
         if (currentPolyline != null)
             currentPolyline.remove();
         currentPolyline = mMap.addPolyline((PolylineOptions) values[0]);
     }
+    public void hideNavigationBan(){
+        this.getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_FULLSCREEN|
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|
+                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        );
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        hideNavigationBan();
+    }
 }

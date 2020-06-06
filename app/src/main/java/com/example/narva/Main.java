@@ -15,8 +15,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -50,8 +48,7 @@ public class Main extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        Window g = getWindow();
-        g.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.TYPE_STATUS_BAR);
+        hideNavigationBan();
         textView = (TextView) findViewById(R.id.textView4);
         name = (TextView)findViewById(R.id.name);
         imageButton = findViewById(R.id.logoutimage);
@@ -76,8 +73,11 @@ public class Main extends AppCompatActivity{
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 FirebaseAuth.getInstance().signOut();
+                user.delete();
                 Intent intToMain = new Intent(Main.this, MainActivity.class);
+                intToMain.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intToMain);
             }
         });
@@ -96,9 +96,7 @@ public class Main extends AppCompatActivity{
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     String user1 = dataSnapshot.child("user").child(uid).child("username").getValue(String.class);
                     name.setText(user1);
-                    Log.d("TAG", "This is text");
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -188,17 +186,6 @@ public class Main extends AppCompatActivity{
         });
     }
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-    }
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -210,5 +197,27 @@ public class Main extends AppCompatActivity{
     public void Unity() {
         Intent intent = new Intent(this, UnityPlayerActivity.class);
         startActivity(intent);
+    }
+    public void hideNavigationBan(){
+        this.getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_FULLSCREEN|
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|
+                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        );
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        hideNavigationBan();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        hideNavigationBan();
     }
 }

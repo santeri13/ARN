@@ -25,8 +25,7 @@ public class Slider extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_slider);
-        Window g = getWindow();
-        g.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.TYPE_STATUS_BAR);
+        hideNavigationBan();
         mPager = (ViewPager)findViewById(R.id.viewPager);
         mDotsLayout = (LinearLayout) findViewById(R.id.dotsLayout);
         slider = new SliderAdapter (layouts,this);
@@ -72,13 +71,31 @@ public class Slider extends AppCompatActivity {
         }
     };
     public void openMain(){
-            Intent intent = new Intent(this, Main.class);
+            Intent intent = new Intent(this, nav.class);
             startActivity(intent);
             finish();
 
     }
+    public void hideNavigationBan(){
+        this.getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_FULLSCREEN|
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|
+                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        );
+    }
+
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStart() {
+        super.onStart();
+        hideNavigationBan();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        hideNavigationBan();
     }
 }

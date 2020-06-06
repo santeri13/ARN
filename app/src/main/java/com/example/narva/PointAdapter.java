@@ -1,25 +1,17 @@
 package com.example.narva;
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import java.util.List;
-import java.util.Random;
 
 public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHolder>{
 
@@ -40,6 +32,7 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
         v = LayoutInflater.from(contex).inflate(R.layout.map_recycleview, parent, false);
         ToursViewHolder holder = new ToursViewHolder(v);
 
+
         dialog = new Dialog(contex);
         dialog.setContentView(R.layout.hint_text_layout);
 
@@ -53,6 +46,7 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
                 dialog.show();
             }
         });
+
         return holder;
 
     }
@@ -61,6 +55,7 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
     public void onBindViewHolder(@NonNull PointAdapter.ToursViewHolder holder, int position) {
         PointReader pointAdapter = tourList.get(position);
         holder.textViewName.setText(pointAdapter.name);
+        holder.number.setText((pointAdapter.number.toString()));
         Glide.with(contex).load(pointAdapter.image).centerCrop().into(holder.foregroundLinearLayout);
         //Picasso.get().load(pointAdapter.image).into(new Target() {
             //@Override
@@ -78,6 +73,12 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
                 //Log.d("TAG", "Prepare Load");
             //}
         //});
+        holder.linearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
     @Override
     public int getItemCount() {
@@ -88,11 +89,20 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
         ImageView foregroundLinearLayout;
         TextView textViewName;
         ImageButton hint;
+        TextView number;
+        LinearLayout linearLayout;
         public ToursViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewName = itemView.findViewById(R.id.info_text);
             foregroundLinearLayout = itemView.findViewById(R.id.photo);
             hint = itemView.findViewById(R.id.show_hint);
+            number = itemView.findViewById(R.id.number);
+            linearLayout = itemView.findViewById(R.id.linear);
         }
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return super.getItemId(position);
     }
 }

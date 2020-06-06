@@ -95,7 +95,6 @@ public class ToursAdapter1 extends RecyclerView.Adapter<ToursAdapter1.ToursViewH
             foregroundLinearLayout = itemView.findViewById(R.id.photo);
             timetext = itemView.findViewById(Math.toIntExact(R.id.time));
             liketext = itemView.findViewById(Math.toIntExact(R.id.like));
-
         }
     }
 }
