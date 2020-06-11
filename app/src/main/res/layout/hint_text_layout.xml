@@ -21,11 +21,25 @@
                 android:layout_height="match_parent"
                 android:layout_weight=".80">
 
-                <ImageView
+                <LinearLayout
                     android:id="@+id/hint_number"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight=".90"/>
+                    android:background="@drawable/ring_shape_red"
+                    android:orientation="vertical"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="5dp">
+
+                    <TextView
+                        android:id="@+id/number"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:fontFamily="@font/robotomedium"
+                        android:gravity="center"
+                        android:textColor="@color/colorWhite" />
+
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/text_header"
@@ -33,19 +47,51 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="@color/colorWhite"
-                    android:textSize="18sp"
-                    android:layout_weight=".10"
-                    android:fontFamily="@font/robotomedium"/>
+                    android:textSize="15sp"
+                    android:fontFamily="@font/robotomedium"
+                    android:layout_marginLeft="5dp"/>
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/hint_text"
+            <ScrollView
+                android:id="@+id/SCROLLER_ID"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical"
+                android:fillViewport="true"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp">
+
+                <TextView
+                    android:id="@+id/hint_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".20"
+                    android:textColor="@color/colorWhite"
+                    android:fontFamily="@font/robotomedium"
+                    android:layout_marginLeft="40dp"/>
+
+            </ScrollView>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight=".20"
-                android:textColor="@color/colorWhite"
-                android:fontFamily="@font/robotomedium"
-                android:layout_marginLeft="40dp"/>
+                android:orientation="horizontal"
+                android:layout_marginBottom="5dp">
+
+                <Button
+                    android:id="@+id/next"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="100dp"
+                    android:layout_marginRight="100dp"
+                    android:background="#33cc33"
+                    android:text="Next"
+                    android:textColor="#ffffff"
+                    android:textSize="20sp">
+
+                </Button>
+
+            </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

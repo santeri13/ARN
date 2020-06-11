@@ -1,5 +1,6 @@
 package com.example.narva;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.app.Dialog;
@@ -12,6 +13,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -218,6 +220,24 @@ public class Main extends AppCompatActivity{
     @Override
     protected void onPause() {
         super.onPause();
+        hideNavigationBan();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        hideNavigationBan();
+        super.onCreate(savedInstanceState, persistentState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hideNavigationBan();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
         hideNavigationBan();
     }
 }

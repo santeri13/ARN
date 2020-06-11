@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="13dp"
-    android:scaleType = "centerCrop">
+    android:scaleType="centerCrop">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
@@ -77,7 +77,7 @@
                         android:layout_height="15dp"
                         android:layout_gravity="center"
                         android:layout_marginTop="7dp"
-                        android:src="@drawable/likebtnhdpi"
+                        android:src="@drawable/like_btnhdpi"
                         />
                     <TextView
                         android:id="@+id/like"
@@ -89,18 +89,21 @@
                         android:textColor="@color/colorWhite"
                         android:textSize="7dp"
                         android:fontFamily="@font/robotomedium"/>
-
-
                 </LinearLayout>
 
-                <Button
-                    android:layout_width="70px"
-                    android:layout_height="70px"
+                <com.varunest.sparkbutton.SparkButton
+                    android:id="@+id/spark_button"
+                    android:layout_width="40sp"
+                    android:layout_height="40sp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/ic_favorite_border_black_24dp"/>
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    app:sparkbutton_activeImage="@drawable/favoritebtnfill"
+                    app:sparkbutton_inActiveImage="@drawable/menu_favourites_icnhdpi"
+                    app:sparkbutton_iconSize="30sp"
+                    app:sparkbutton_primaryColor="@color/colorRed"
+                    app:sparkbutton_secondaryColor="@color/colorWhite"/>
 
             </RelativeLayout>
 

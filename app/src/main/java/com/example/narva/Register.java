@@ -1,8 +1,10 @@
 package com.example.narva;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -103,6 +105,23 @@ public class Register extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        hideNavigationBan();
+    }
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        hideNavigationBan();
+        super.onCreate(savedInstanceState, persistentState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hideNavigationBan();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
         hideNavigationBan();
     }
 }

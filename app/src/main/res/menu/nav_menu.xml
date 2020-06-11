@@ -4,27 +4,31 @@
     <item
         android:id="@id/tours"
         android:title="Tours"
-        android:icon="@drawable/menutoursicnhdpi"/>
+        android:icon="@drawable/menu_tours_icnhdpi"/>
     <item
         android:id="@id/leaderboard"
         android:title="Leaderboards"
-        android:icon="@drawable/menuhelpicnhdpi" />
+        android:icon="@drawable/menu_leader_icnhdpi" />
 
     <item
         android:id="@id/favourites"
         android:title="Favourites"
-        android:icon="@drawable/menufavouritesicnhdpi"/>
+        android:icon="@drawable/menu_favourites_icnhdpi"/>
     <item
         android:id="@id/mypoints"
         android:title="My points"
-        android:icon="@drawable/menupointsicnhdpi"/>
+        android:icon="@drawable/menu_points_icnhdpi"/>
     <item
         android:id="@id/tourcode"
         android:title="Tour code"
-        android:icon="@drawable/menucodeicnhdpi"/>
+        android:icon="@drawable/menu_code_icnhdpi"/>
     <item
         android:id="@id/help"
         android:title="Help"
-        android:icon="@drawable/menuhelpicnhdpi"/>
+        android:icon="@drawable/menu_help_icnhdpi"/>
+    <item
+        android:id="@+id/logout"
+        android:title="Logout"
+        android:icon="@drawable/menu_logout_icnhdpi"/>
 
 </menu>

@@ -36,13 +36,27 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
         dialog = new Dialog(contex);
         dialog.setContentView(R.layout.hint_text_layout);
 
-        holder.hint.setOnClickListener(new View.OnClickListener() {
+        holder.foregroundLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TextView name = dialog.findViewById(R.id.text_header);
                 TextView text = dialog.findViewById(R.id.hint_text);
+                TextView number = dialog.findViewById(R.id.number);
                 name.setText(tourList.get(holder.getAdapterPosition()).getName());
                 text.setText(tourList.get(holder.getAdapterPosition()).getText());
+                number.setText(tourList.get(holder.getAdapterPosition()).getNumber().toString());
+                dialog.show();
+            }
+        });
+        holder.textViewName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TextView name = dialog.findViewById(R.id.text_header);
+                TextView text = dialog.findViewById(R.id.hint_text);
+                TextView number = dialog.findViewById(R.id.number);
+                name.setText(tourList.get(holder.getAdapterPosition()).getName());
+                text.setText(tourList.get(holder.getAdapterPosition()).getText());
+                number.setText(tourList.get(holder.getAdapterPosition()).getNumber().toString());
                 dialog.show();
             }
         });
@@ -73,12 +87,6 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
                 //Log.d("TAG", "Prepare Load");
             //}
         //});
-        holder.linearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
     }
     @Override
     public int getItemCount() {
@@ -90,14 +98,12 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
         TextView textViewName;
         ImageButton hint;
         TextView number;
-        LinearLayout linearLayout;
         public ToursViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewName = itemView.findViewById(R.id.info_text);
             foregroundLinearLayout = itemView.findViewById(R.id.photo);
             hint = itemView.findViewById(R.id.show_hint);
             number = itemView.findViewById(R.id.number);
-            linearLayout = itemView.findViewById(R.id.linear);
         }
     }
 

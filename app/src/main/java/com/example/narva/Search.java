@@ -69,7 +69,7 @@ public class Search extends Fragment {
         }
         if(nav.getField1().length()>=1){
             town = nav.getField1();
-            Query reference = FirebaseDatabase.getInstance().getReference("Tours").orderByChild("Town").equalTo(town);
+            Query reference = FirebaseDatabase.getInstance().getReference("Tours").orderByChild("Town").startAt(town);
             reference.addValueEventListener(valueEventListener);
         }
         else{

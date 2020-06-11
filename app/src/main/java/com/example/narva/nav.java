@@ -1,14 +1,19 @@
 package com.example.narva;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -92,7 +97,7 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     Long user1 = dataSnapshot.child("user").child(uid).child("points").getValue(Long.class);
-                    String username1 = dataSnapshot.child("user").child(uid).child("points").getValue(String.class);
+                    String username1 = dataSnapshot.child("user").child(uid).child("username").getValue(String.class);
                     String user2 = user1.toString().trim();
                     username.setText(username1);
                     point.setText(user2);
@@ -153,6 +158,13 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
             case R.id.help:
                 Toast.makeText(this,"Sorry but this function is come in next update",Toast.LENGTH_SHORT).show();
                 break;
+            case R.id.logout:
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                FirebaseAuth.getInstance().signOut();
+                user.delete();
+                Intent intToMain = new Intent(nav.this, MainActivity.class);
+                intToMain.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intToMain);
         }
         return true;
     }
@@ -169,13 +181,42 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
 
     @Override
     protected void onStart() {
-        super.onStart();
         hideNavigationBan();
+        super.onStart();
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
         hideNavigationBan();
+        super.onPause();
+    }
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        hideNavigationBan();
+        super.onCreate(savedInstanceState, persistentState);
+    }
+
+    @Override
+    protected void onResume() {
+        hideNavigationBan();
+        super.onResume();
+    }
+
+    @Override
+    protected void onRestart() {
+        hideNavigationBan();
+        super.onRestart();
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            moveTaskToBack(true);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }

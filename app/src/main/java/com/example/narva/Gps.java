@@ -1,16 +1,24 @@
 package com.example.narva;
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -54,7 +62,7 @@ import java.util.List;
 
 public class Gps extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener,TaskLoadedCallback{
+        LocationListener,TaskLoadedCallback {
     private static final int REQUEST_CHECK_SETTINGS = 0x1;
     private static GoogleApiClient mGoogleApiClient;
     private static final int ACCESS_FINE_LOCATION_INTENT_ID = 3;
@@ -63,19 +71,21 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
     Location mLastLocation;
     Marker mCurrLocationMarker;
     LatLng latLng;
-    MarkerOptions lionmarker, markerOptions1;
+    MarkerOptions lionmarker, markerOptions1,currentmarker;
     private Polyline currentPolyline;
     double latitude, longtitude;
     double end_latitude,end_longtitude;
     TextView textTitle,points;
     DatabaseReference mreference,database,reference;
-    String title;
+    String title,status;
     RecyclerView recyclerView;
     private List<PointReader> artistList;
     private PointAdapter adapter;
     String uid;
-    int pathindicator;
+    int pathindicator, pointsofuser;
+    Dialog dialog,dialog2;
     List<Double> latitudearraylist,longtitudearraylist;
+    private Context contex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +93,7 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         setContentView(R.layout.map);
         Intent i = getIntent();
         hideNavigationBan();
+        pathindicator =0;
         points = (TextView)findViewById(R.id.points);
         title = i.getStringExtra("title");
         textTitle = findViewById(R.id.tour_text);
@@ -94,21 +105,40 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         mreference.addValueEventListener(valueEventListener);
         recyclerView = (RecyclerView)findViewById(R.id.setpath);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager ilm = new LinearLayoutManager(this);
+        LinearLayoutManager ilm = new LinearLayoutManager(this){
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        };
         ilm.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(ilm);
         artistList = new ArrayList<>();
         adapter = new PointAdapter(this,artistList);
         recyclerView.setAdapter(adapter);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        uid = user.getUid();
+        DatabaseReference userpoints  = FirebaseDatabase.getInstance().getReference("user").child(uid);
+        userpoints.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.hasChild(title)) {
+                    ToursRegister registerDatabase = new ToursRegister("undone");
+                    userpoints.child(title).setValue(registerDatabase);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         initGoogleAPIClient();
         checkPermissions();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        uid = user.getUid();
         database = FirebaseDatabase.getInstance().getReference();
-
         if (user.isAnonymous()) {
             points.setText("0");
         }
@@ -118,6 +148,7 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     Long user1 = dataSnapshot.child("user").child(uid).child("points").getValue(Long.class);
+                    pointsofuser = Math.toIntExact(user1);
                     String user2 = user1.toString().trim();
                     points.setText(user2);
                 }
@@ -128,6 +159,20 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                 }
             });
         }
+        ImageButton back_button = findViewById(R.id.button_back);
+        back_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(),"WARNING: All of your progress would not been save", Toast.LENGTH_LONG).show();
+                back_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Back();
+                    }
+                });
+
+            }
+        });
     }
     ValueEventListener valueEventListener = (new ValueEventListener() {
         @Override
@@ -291,6 +336,13 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         }catch(Resources.NotFoundException e){
             Log.e("Gps","Cant find style");
         }
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+        Bitmap bmp = Bitmap.createBitmap(80, 80, conf);
+        Canvas canvas1 = new Canvas(bmp);
+        Paint color = new Paint();
+        color.setTextSize(35);
+        color.setColor(Color.BLACK);
+        canvas1.drawText("User Name!", 30, 40,color);
         mMap.setMaxZoomPreference(17.0f);
         mreference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -398,38 +450,77 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
-        pathindicator =0;
         TextView textView = findViewById(R.id.meters);
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
+
+        dialog = adapter.dialog;
+        Button next = dialog.findViewById(R.id.next);
+
+        if(pathindicator+1 == latitudearraylist.size()){
+            next.setText("Finish");
+        }
+
         latitude = location.getLatitude();
         longtitude = location.getLongitude();
-        if(pathindicator+1 > latitudearraylist.size()){
 
+        if(pathindicator+1 > latitudearraylist.size()){
+            Finishtour(dialog);
         }
-        else{
+        else {
             end_latitude = latitudearraylist.get(pathindicator);
             end_longtitude = longtitudearraylist.get(pathindicator);
             //Place current location marker
             latLng = new LatLng(location.getLatitude(), location.getLongitude());
-            markerOptions1 = new MarkerOptions().position( new LatLng (location.getLatitude(), location.getLongitude()));
+            markerOptions1 = new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude()));
+            currentmarker = new MarkerOptions().position(new LatLng(end_latitude, end_longtitude));
             new FetchURL(Gps.this).execute(getUrl(markerOptions1.getPosition(), lionmarker.getPosition(), "walking"), "walking");
             float result[] = new float[1];
-            Location.distanceBetween(latitude,longtitude,end_latitude,end_longtitude,result);
-            Log.d("TAG","latitude"+ end_latitude);
-            Log.d("TAG","longtitude"+end_longtitude);
-            for(int i = 0, n = result.length; i <n ;i++){
-                textView.setText((int) result[i]+"m");
-                if(result[i]<=50){
-                    mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                        @Override
-                        public boolean onMarkerClick(Marker marker) {
-                            pathindicator = pathindicator +1;
-                            return false;
+            Location.distanceBetween(latitude, longtitude, end_latitude, end_longtitude, result);
+            Log.d("TAG", "latitude" + end_latitude);
+            Log.d("TAG", "longtitude" + end_longtitude);
+            Log.d("TAG", "pathindicator" + pathindicator);
+            for (int i = 0, n = result.length; i < n; i++) {
+                textView.setText((int) result[i] + "m");
+                //if(result[i]<=50)
+                next.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        pathindicator = pathindicator + 1;
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        DatabaseReference userpoints  = FirebaseDatabase.getInstance().getReference("user").child(uid).child(title);
+                        userpoints.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                String status = dataSnapshot.child("tours").getValue(String.class);
+                                if(user.isAnonymous()){
+                                    pointsofuser = pointsofuser;
+                                }
+                                else if (status.equals("done")){
+                                    pointsofuser = pointsofuser;
+                                }
+                                else{
+                                    pointsofuser = pointsofuser +200;
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                        points.setText(Integer.toString(pointsofuser));
+                        if(pathindicator+1 > latitudearraylist.size()){
+                            Finishtour(dialog);
                         }
-                    });
-                }
+                        else{
+                            currentmarker = new MarkerOptions().position(new LatLng(end_latitude, end_longtitude));
+                            recyclerView.scrollToPosition(pathindicator);
+                            dialog.dismiss();
+                        }
+                    }
+                });
             }
         }
 
@@ -475,8 +566,6 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                         })
                         .create()
                         .show();
-
-
             } else {
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
@@ -512,10 +601,52 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                         View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         );
     }
-
     @Override
     protected void onStart() {
         super.onStart();
         hideNavigationBan();
+    }
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        hideNavigationBan();
+        super.onCreate(savedInstanceState, persistentState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hideNavigationBan();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        hideNavigationBan();
+    }
+    public void Back(){
+        Intent intent = new Intent(this, nav.class);
+        startActivity(intent);
+    }
+    public void Finishtour(Dialog dialog){
+        dialog.dismiss();
+        dialog.setContentView(R.layout.finish_recycleview);
+        dialog.show();
+        Button finish = dialog.findViewById(R.id.finish);
+        finish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if(user.isAnonymous()){
+                    Back();
+                }
+                else{
+                    DatabaseReference userpoints  = FirebaseDatabase.getInstance().getReference("user").child(uid);
+                    userpoints.child(title).child("tours").setValue("done");
+                    userpoints.child("points").setValue(pointsofuser);
+                    userpoints.keepSynced(true);
+                    Back();
+                }
+            }
+        });
     }
 }
