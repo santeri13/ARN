@@ -15,6 +15,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -58,10 +59,17 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
         Navigation.setViewNavController(navigation,navController);
         EditText field1 = (EditText)findViewById(R.id.search);
         field1.setSelection(0);
+        field1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                hideNavigationBan();
+                return false;
+            }
+        });
         field1.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                hideNavigationBan();
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -69,12 +77,14 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
                 Tours newsecondFragment = new Tours();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 if(field1.length() >= 1){
+                    hideNavigationBan();
                     addtown(field1);
                     transaction.replace(R.id.navHostFragment,newFragment);
                     transaction.addToBackStack(null);
                     transaction.commit();
                 }
                 else{
+                    hideNavigationBan();
                     transaction.replace(R.id.navHostFragment,newsecondFragment);
                     transaction.addToBackStack(null);
                     transaction.commit();

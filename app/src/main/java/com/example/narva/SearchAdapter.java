@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
@@ -21,7 +22,7 @@ import com.squareup.picasso.Target;
 import java.util.List;
 import java.util.Random;
 
-public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ToursViewHolder>  {
+public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ToursViewHolder> {
 
     private Context mCtx;
     private List<SearchReader> tourList;

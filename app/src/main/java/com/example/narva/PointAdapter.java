@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,8 +30,6 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
 
         v = LayoutInflater.from(contex).inflate(R.layout.map_recycleview, parent, false);
         ToursViewHolder holder = new ToursViewHolder(v);
-
-
         dialog = new Dialog(contex);
         dialog.setContentView(R.layout.hint_text_layout);
 
@@ -111,4 +108,5 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
     public long getItemId(int position) {
         return super.getItemId(position);
     }
+
 }

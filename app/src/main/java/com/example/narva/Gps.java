@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -104,7 +105,9 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         reference.keepSynced(true);
         mreference.addValueEventListener(valueEventListener);
         recyclerView = (RecyclerView)findViewById(R.id.setpath);
-        recyclerView.setHasFixedSize(true);
+        CustomGridLayoutManager customGridLayoutManager = new CustomGridLayoutManager(this);
+        customGridLayoutManager.setScrollEnabled(false);
+        recyclerView.setLayoutManager(customGridLayoutManager);
         LinearLayoutManager ilm = new LinearLayoutManager(this){
             @Override
             public boolean canScrollVertically() {
