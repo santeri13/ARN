@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="13dp"
     android:scaleType="centerCrop">
 
@@ -11,14 +11,13 @@
         android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        card_view:cardCornerRadius="21px">
+        card_view:cardCornerRadius="40px">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -27,28 +26,27 @@
                 <ImageView
                     android:id="@+id/photo"
                     android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitXY"
-                    />
+                    android:layout_height="100dp"
+                    android:adjustViewBounds="true" />
 
                 <LinearLayout
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:background="@drawable/ring_shape"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="7dp"
                     android:layout_marginEnd="10dp"
                     android:orientation="vertical">
+
                     <TextView
                         android:id="@+id/time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="5dp"
                         android:textColor="@color/colorWhite"
-                        android:textSize="20dp"
+                        android:textSize="15dp"
                         android:gravity="center"
                         android:fontFamily="@font/robotomedium"/>
                     <TextView
@@ -56,7 +54,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="min"
-                        android:textSize="10dp"
+                        android:textSize="8dp"
                         android:gravity="center"
                         android:textColor="@color/colorWhite"
                         android:fontFamily="@font/robotomedium"/>
@@ -64,62 +62,75 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:background="@drawable/ring_shape"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginTop="75dp"
+                    android:layout_marginTop="55dp"
                     android:layout_marginEnd="10dp"
                     android:scaleType="centerInside"
                     android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:layout_gravity="center"
-                        android:layout_marginTop="10dp"
-                        android:src="@drawable/like_btnhdpi"/>
+                        android:layout_marginTop="7dp"
+                        android:src="@drawable/like_btnhdpi"
+                        />
                     <TextView
                         android:id="@+id/like"
-                        android:layout_marginTop="3dp"
+                        android:layout_marginTop="1dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:textSize="10dp"
                         android:gravity="center"
                         android:textColor="@color/colorWhite"
+                        android:textSize="10dp"
                         android:fontFamily="@font/robotomedium"/>
-
-
                 </LinearLayout>
 
                 <com.varunest.sparkbutton.SparkButton
                     android:id="@+id/spark_button"
-                    android:layout_width="50sp"
-                    android:layout_height="50sp"
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
                     app:sparkbutton_activeImage="@drawable/favoritebtnfill"
                     app:sparkbutton_inActiveImage="@drawable/menu_favourites_icnhdpi"
                     app:sparkbutton_iconSize="30sp"
                     app:sparkbutton_primaryColor="@color/colorRed"
-                    app:sparkbutton_secondaryColor="@color/colorWhite"/>
+                    app:sparkbutton_secondaryColor="@color/colorWhite"
+                    android:scaleType="fitXY"
+                    android:maxWidth="25dp"
+                    android:maxHeight="25dp"
+                    android:adjustViewBounds="true"
+                    android:cropToPadding="false"
+                    android:layout_centerHorizontal="true"/>
 
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/info_text"
+            <LinearLayout
+                android:id="@+id/textcolor"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:gravity="left|center_vertical"
-                android:paddingLeft="5dp"
-                android:text="Narva Battle"
-                android:textColor="#FFFFFF"
-                android:textSize="12dp"
-                android:fontFamily="@font/robotomedium"/>
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/info_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:paddingLeft="5dp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13dp"
+                    android:gravity="left|center_vertical"
+                    android:fontFamily="@font/robotolight"
+                    android:layout_marginLeft="10dp"/>
+
+
+            </LinearLayout>
 
 
         </LinearLayout>

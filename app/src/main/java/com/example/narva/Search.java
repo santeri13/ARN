@@ -29,7 +29,7 @@ public class Search extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private DatabaseReference reference;
-    private List<TourReader> artistList;
+    private List<TourReader1> artistList;
     private ToursAdapter1 adapter;
     private RecyclerView recyclerView;
     public String town;
@@ -76,6 +76,7 @@ public class Search extends Fragment {
             reference = FirebaseDatabase.getInstance().getReference("Tours");
             reference.addValueEventListener(valueEventListener);
         }
+
     }
 
     ValueEventListener valueEventListener = (new ValueEventListener() {
@@ -84,7 +85,7 @@ public class Search extends Fragment {
             artistList.clear();
             if (dataSnapshot.exists()) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    TourReader artist = snapshot.getValue(TourReader.class);
+                    TourReader1 artist = snapshot.getValue(TourReader1.class);
                     artistList.add(artist);
                 }
                 adapter.notifyDataSetChanged();
@@ -96,6 +97,7 @@ public class Search extends Fragment {
 
         }
     });
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

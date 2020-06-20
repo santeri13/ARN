@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,11 +29,13 @@ public class Tours extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private FirebaseDatabase mDatabase;
-    private DatabaseReference reference;
+    private DatabaseReference reference,reference2;
     private RecyclerView recyclerView,recyclerView2;
     private ToursAdapter1 adapter1;
     private ToursAdapter2 adapter2;
-    private List<TourReader> artistList;
+    private List<TourReader1> artistList;
+    private List<TourReader2> lovedtours;
+    String uid;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -66,7 +70,12 @@ public class Tours extends Fragment {
         }
         reference = FirebaseDatabase.getInstance().getReference("Tours");
         reference.addValueEventListener(valueEventListener);
+        reference.addValueEventListener(valueEventListener2);
         reference.keepSynced(true);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        uid = user.getUid();
+        reference2 = FirebaseDatabase.getInstance().getReference("user").child(uid);
+        reference2.keepSynced(true);
     }
     ValueEventListener valueEventListener = (new ValueEventListener() {
         @Override
@@ -74,10 +83,27 @@ public class Tours extends Fragment {
             artistList.clear();
             if (dataSnapshot.exists()) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    TourReader artist = snapshot.getValue(TourReader.class);
+                    TourReader1 artist = snapshot.getValue(TourReader1.class);
                     artistList.add(artist);
                 }
                 adapter1.notifyDataSetChanged();
+            }
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+        }
+    });
+    ValueEventListener valueEventListener2 = (new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            lovedtours.clear();
+            if (dataSnapshot.exists()) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    TourReader2 artist = snapshot.getValue(TourReader2.class);
+                    lovedtours.add(artist);
+                }
                 adapter2.notifyDataSetChanged();
             }
         }
@@ -92,19 +118,20 @@ public class Tours extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootview = inflater.inflate(R.layout.tours, container, false);
-        recyclerView = rootview.findViewById(R.id.list);
+        recyclerView = rootview.findViewById(R.id.list2);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         artistList = new ArrayList<>();
-        adapter2 = new ToursAdapter2(getContext(), artistList);
-        recyclerView.setAdapter(adapter2);
+        adapter1 = new ToursAdapter1(getContext(), artistList);
+        recyclerView.setAdapter(adapter1);
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), 2);
         recyclerView.setLayoutManager(mGridLayoutManager);
-        recyclerView2 = rootview.findViewById(R.id.list2);
+        recyclerView2 = rootview.findViewById(R.id.list);
         recyclerView2.setHasFixedSize(true);
         recyclerView2.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter1 = new ToursAdapter1(getContext(), artistList);
-        recyclerView2.setAdapter(adapter1);
+        lovedtours = new ArrayList<>();
+        adapter2 = new ToursAdapter2(getContext(), lovedtours);
+        recyclerView2.setAdapter(adapter2);
         LinearLayoutManager mLinearLayoutManagerHorizontal = new LinearLayoutManager(getContext());
         mLinearLayoutManagerHorizontal.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView2.setLayoutManager(mLinearLayoutManagerHorizontal);

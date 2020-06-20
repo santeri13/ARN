@@ -2,7 +2,6 @@ package com.example.narva;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -19,7 +18,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -41,6 +39,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -86,7 +85,6 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
     int pathindicator, pointsofuser;
     Dialog dialog,dialog2;
     List<Double> latitudearraylist,longtitudearraylist;
-    private Context contex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,12 +120,17 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         uid = user.getUid();
         DatabaseReference userpoints  = FirebaseDatabase.getInstance().getReference("user").child(uid);
+        ToursRegister registerDatabase = new ToursRegister("undone");
         userpoints.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChild(title)) {
-                    ToursRegister registerDatabase = new ToursRegister("undone");
                     userpoints.child(title).setValue(registerDatabase);
+                    userpoints.keepSynced(true);
+                }
+                else{
+                    userpoints.child(title).child("tours").setValue("undone");
+                    userpoints.keepSynced(true);
                 }
             }
 
@@ -174,6 +177,13 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                     }
                 });
 
+            }
+        });
+        TextView textView = findViewById(R.id.meters);
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getMyLocation();
             }
         });
     }
@@ -333,6 +343,8 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
         try{
             boolean success = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.arn_map));
 
@@ -651,5 +663,10 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                 }
             }
         });
+    }
+    private void getMyLocation() {
+        LatLng latLng = new LatLng(Double.parseDouble(String.valueOf(latitude)), Double.parseDouble(String.valueOf(longtitude)));
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
+        mMap.animateCamera(cameraUpdate);
     }
 }

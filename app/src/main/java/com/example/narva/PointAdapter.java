@@ -1,6 +1,8 @@
 package com.example.narva;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,33 +32,6 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
 
         v = LayoutInflater.from(contex).inflate(R.layout.map_recycleview, parent, false);
         ToursViewHolder holder = new ToursViewHolder(v);
-        dialog = new Dialog(contex);
-        dialog.setContentView(R.layout.hint_text_layout);
-
-        holder.foregroundLinearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TextView name = dialog.findViewById(R.id.text_header);
-                TextView text = dialog.findViewById(R.id.hint_text);
-                TextView number = dialog.findViewById(R.id.number);
-                name.setText(tourList.get(holder.getAdapterPosition()).getName());
-                text.setText(tourList.get(holder.getAdapterPosition()).getText());
-                number.setText(tourList.get(holder.getAdapterPosition()).getNumber().toString());
-                dialog.show();
-            }
-        });
-        holder.textViewName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TextView name = dialog.findViewById(R.id.text_header);
-                TextView text = dialog.findViewById(R.id.hint_text);
-                TextView number = dialog.findViewById(R.id.number);
-                name.setText(tourList.get(holder.getAdapterPosition()).getName());
-                text.setText(tourList.get(holder.getAdapterPosition()).getText());
-                number.setText(tourList.get(holder.getAdapterPosition()).getNumber().toString());
-                dialog.show();
-            }
-        });
 
         return holder;
 
@@ -68,6 +43,49 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
         holder.textViewName.setText(pointAdapter.name);
         holder.number.setText((pointAdapter.number.toString()));
         Glide.with(contex).load(pointAdapter.image).centerCrop().into(holder.foregroundLinearLayout);
+
+        dialog = new Dialog(contex);
+        dialog.setContentView(R.layout.hint_text_layout);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        holder.foregroundLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TextView name = dialog.findViewById(R.id.text_header);
+                TextView text = dialog.findViewById(R.id.hint_text);
+                TextView number = dialog.findViewById(R.id.number);
+                ImageButton close = dialog.findViewById(R.id.close);
+                name.setText(tourList.get(holder.getAdapterPosition()).getName());
+                text.setText(tourList.get(holder.getAdapterPosition()).getText());
+                number.setText(tourList.get(holder.getAdapterPosition()).getNumber().toString());
+                dialog.show();
+                close.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+        holder.textViewName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TextView name = dialog.findViewById(R.id.text_header);
+                TextView text = dialog.findViewById(R.id.hint_text);
+                TextView number = dialog.findViewById(R.id.number);
+                ImageButton close = dialog.findViewById(R.id.close);
+                name.setText(tourList.get(holder.getAdapterPosition()).getName());
+                text.setText(tourList.get(holder.getAdapterPosition()).getText());
+                number.setText(tourList.get(holder.getAdapterPosition()).getNumber().toString());
+                close.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+            }
+        });
         //Picasso.get().load(pointAdapter.image).into(new Target() {
             //@Override
             //public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
