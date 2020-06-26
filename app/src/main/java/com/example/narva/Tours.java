@@ -87,6 +87,7 @@ public class Tours extends Fragment {
                     artistList.add(artist);
                 }
                 adapter1.notifyDataSetChanged();
+                adapter2.notifyDataSetChanged();
             }
         }
 
@@ -113,7 +114,6 @@ public class Tours extends Fragment {
 
         }
     });
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

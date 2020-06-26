@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="20dp"
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
     android:scaleType="centerCrop">
@@ -96,12 +98,12 @@
 
                 <com.varunest.sparkbutton.SparkButton
                     android:id="@+id/spark_button"
-                    android:layout_width="40sp"
-                    android:layout_height="40sp"
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="15dp"
                     app:sparkbutton_activeImage="@drawable/favorite_btn_fill"
                     app:sparkbutton_inActiveImage="@drawable/favourite_btnhdpi"
                     app:sparkbutton_iconSize="30sp"

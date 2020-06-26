@@ -2,9 +2,10 @@ package com.example.narva;
 
 public class SearchReader {
 
-    public String id,Name,link;
+    public String id,Name,link,Town,color;
+    public Long like,time;
 
-    public SearchReader(){
+    public SearchReader() {
 
     }
 }

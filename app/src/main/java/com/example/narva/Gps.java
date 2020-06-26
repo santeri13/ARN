@@ -8,9 +8,11 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -28,6 +30,9 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.ARN.Narva.UnityPlayerActivity;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -44,6 +49,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
@@ -57,6 +63,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,6 +93,7 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
     int pathindicator, pointsofuser;
     Dialog dialog,dialog2;
     List<Double> latitudearraylist,longtitudearraylist;
+    Bitmap image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,12 +112,14 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         reference.keepSynced(true);
         mreference.addValueEventListener(valueEventListener);
         recyclerView = (RecyclerView)findViewById(R.id.setpath);
-        CustomGridLayoutManager customGridLayoutManager = new CustomGridLayoutManager(this);
-        customGridLayoutManager.setScrollEnabled(false);
-        recyclerView.setLayoutManager(customGridLayoutManager);
         LinearLayoutManager ilm = new LinearLayoutManager(this){
             @Override
             public boolean canScrollVertically() {
+                return false;
+            }
+
+            @Override
+            public boolean canScrollHorizontally() {
                 return false;
             }
         };
@@ -128,7 +139,7 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                     userpoints.child(title).setValue(registerDatabase);
                     userpoints.keepSynced(true);
                 }
-                else{
+                else if(dataSnapshot.hasChild(title)&& !dataSnapshot.child(title).hasChild("tours")){
                     userpoints.child(title).child("tours").setValue("undone");
                     userpoints.keepSynced(true);
                 }
@@ -371,7 +382,17 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                     longtitudearraylist.add(longtitude);
                     String name = child.child("name").getValue(String.class);
                     LatLng cod = new LatLng(latitude,longtitude);
-                    mMap.addMarker(new MarkerOptions().position(cod).title(name));
+                    Glide.with(getBaseContext()).asBitmap().load(child.child("marker").getValue(String.class)).into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            mMap.addMarker(new MarkerOptions().position(cod).title(name).icon(BitmapDescriptorFactory.fromBitmap(resource)));
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                        }
+                    });
                 }
             }
 
@@ -380,11 +401,12 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
 
             }
         });
+
         mreference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    double latitude = dataSnapshot.child("Coordinate1").child("latitude").getValue(Double.class);
-                    double longtitude = dataSnapshot.child("Coordinate1").child("longtitude").getValue(Double.class);
+                    double latitude = dataSnapshot.child("1").child("latitude").getValue(Double.class);
+                    double longtitude = dataSnapshot.child("1").child("longtitude").getValue(Double.class);
                     String name = dataSnapshot.child("name").getValue(String.class);
                     LatLng cod = new LatLng(latitude,longtitude);
                     lionmarker = new MarkerOptions().position(cod).title(name);

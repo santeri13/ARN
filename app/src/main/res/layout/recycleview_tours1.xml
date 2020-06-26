@@ -93,23 +93,23 @@
 
                 <com.varunest.sparkbutton.SparkButton
                     android:id="@+id/spark_button"
-                    android:layout_width="30sp"
-                    android:layout_height="30sp"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
-                    app:sparkbutton_activeImage="@drawable/favoritebtnfill"
-                    app:sparkbutton_inActiveImage="@drawable/menu_favourites_icnhdpi"
-                    app:sparkbutton_iconSize="30sp"
-                    app:sparkbutton_primaryColor="@color/colorRed"
-                    app:sparkbutton_secondaryColor="@color/colorWhite"
-                    android:scaleType="fitXY"
-                    android:maxWidth="25dp"
-                    android:maxHeight="25dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
                     android:adjustViewBounds="true"
                     android:cropToPadding="false"
-                    android:layout_centerHorizontal="true"/>
+                    android:maxWidth="25dp"
+                    android:maxHeight="25dp"
+                    android:scaleType="fitXY"
+                    app:sparkbutton_activeImage="@drawable/favorite_btn_fill"
+                    app:sparkbutton_iconSize="30sp"
+                    app:sparkbutton_inActiveImage="@drawable/favourite_btnhdpi"
+                    app:sparkbutton_primaryColor="@color/colorRed"
+                    app:sparkbutton_secondaryColor="@color/colorWhite" />
 
             </RelativeLayout>
 

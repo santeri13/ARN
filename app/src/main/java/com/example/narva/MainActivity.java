@@ -11,7 +11,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -71,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                             else{
                                 Intent intToHome = new Intent(MainActivity.this,nav.class);
                                 startActivity(intToHome);
+                                finish();
                             }
                         }
                     });
@@ -111,10 +111,12 @@ public class MainActivity extends AppCompatActivity {
     public void openSlider(){
         Intent intent = new Intent(this, Slider.class);
         startActivity(intent);
+        finish();
     }
     public void openRegister(){
         Intent intent = new Intent(this, Register.class);
         startActivity(intent);
+        finish();
     }
 
     @Override
@@ -169,4 +171,9 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left,R.anim.slide_in_right);
+    }
 }

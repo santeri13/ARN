@@ -29,8 +29,8 @@ public class Search extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private DatabaseReference reference;
-    private List<TourReader1> artistList;
-    private ToursAdapter1 adapter;
+    private List<SearchReader> artistList;
+    private SearchAdapter adapter;
     private RecyclerView recyclerView;
     public String town;
 
@@ -85,7 +85,7 @@ public class Search extends Fragment {
             artistList.clear();
             if (dataSnapshot.exists()) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    TourReader1 artist = snapshot.getValue(TourReader1.class);
+                    SearchReader artist = snapshot.getValue(SearchReader.class);
                     artistList.add(artist);
                 }
                 adapter.notifyDataSetChanged();
@@ -107,7 +107,7 @@ public class Search extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         artistList = new ArrayList<>();
-        adapter = new ToursAdapter1(getContext(), artistList);
+        adapter = new SearchAdapter(getContext(), artistList);
         recyclerView.setAdapter(adapter);
         LinearLayoutManager mLinearLayoutManagerVertical = new LinearLayoutManager(getContext());
         mLinearLayoutManagerVertical.setOrientation(LinearLayoutManager.VERTICAL);

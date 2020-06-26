@@ -14,12 +14,12 @@
 
         <ImageButton
             android:id="@+id/button_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="17dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="32dp"
             android:gravity="center"
-            android:layout_marginStart="10dp"
-            android:src="@drawable/menu_back_btnhdpi"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/back_btnhdpi"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:background="#405fe5"/>
@@ -121,7 +121,7 @@
         <TextView
             android:id="@+id/protivoves"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
+            android:layout_height="45dp"
             android:layout_alignParentBottom="true" />
 
     </RelativeLayout>
