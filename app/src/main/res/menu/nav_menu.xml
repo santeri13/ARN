@@ -11,7 +11,7 @@
         android:icon="@drawable/menu_leader_icnhdpi" />
 
     <item
-        android:id="@id/favourites"
+        android:id="@id/favourite"
         android:title="Favourites"
         android:icon="@drawable/menu_favourites_icnhdpi"/>
     <item

@@ -28,8 +28,7 @@ public class Tours extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private FirebaseDatabase mDatabase;
-    private DatabaseReference reference,reference2;
+    private DatabaseReference reference;
     private RecyclerView recyclerView,recyclerView2;
     private ToursAdapter1 adapter1;
     private ToursAdapter2 adapter2;
@@ -74,8 +73,6 @@ public class Tours extends Fragment {
         reference.keepSynced(true);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         uid = user.getUid();
-        reference2 = FirebaseDatabase.getInstance().getReference("user").child(uid);
-        reference2.keepSynced(true);
     }
     ValueEventListener valueEventListener = (new ValueEventListener() {
         @Override
@@ -87,7 +84,6 @@ public class Tours extends Fragment {
                     artistList.add(artist);
                 }
                 adapter1.notifyDataSetChanged();
-                adapter2.notifyDataSetChanged();
             }
         }
 

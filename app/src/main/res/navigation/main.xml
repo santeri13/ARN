@@ -4,15 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     app:startDestination="@id/tours">
-
-
     <fragment
         android:id="@+id/mypoints"
         android:name="com.example.narva.My_points"
         android:label="create_tour"
         tools:layout="@layout/mypoints" />
     <fragment
-        android:id="@+id/favourites"
+        android:id="@+id/favourite"
         android:name="com.example.narva.Favourite"
         android:label="favourite"
         tools:layout="@layout/favourite" />

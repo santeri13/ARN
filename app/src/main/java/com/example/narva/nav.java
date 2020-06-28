@@ -35,17 +35,19 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
     String uid;
     DatabaseReference database;
     TextView point, username;
+    DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nav);
         hideNavigationBan();
-        final DrawerLayout drawerLayout = findViewById(R.id.drawerlayout);
+        drawerLayout = findViewById(R.id.drawerlayout);
         findViewById(R.id.imageMenu).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 drawerLayout.openDrawer(GravityCompat.START);
+
             }
         });
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
@@ -151,13 +153,13 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.tours:
-                getSupportFragmentManager().beginTransaction().replace(R.id.tours, new Tours());
+                getSupportFragmentManager().beginTransaction().replace(R.id.navHostFragment, new Tours()).commit();
                 break;
             case R.id.leaderboard:
                 Toast.makeText(this,"Sorry but this function is come in next update",Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.favourites:
-                Toast.makeText(this,"Sorry but this function is come in next update",Toast.LENGTH_SHORT).show();
+            case R.id.favourite:
+                getSupportFragmentManager().beginTransaction().replace(R.id.navHostFragment,new Favourite()).commit();
                 break;
             case R.id.tourcode:
                 Toast.makeText(this,"Sorry but this function is come in next update",Toast.LENGTH_SHORT).show();
@@ -176,6 +178,7 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
                 intToMain.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intToMain);
         }
+        drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
     public void hideNavigationBan(){
@@ -227,6 +230,11 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
     }
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
+        else{
+            super.onBackPressed();
+        }
     }
 }
