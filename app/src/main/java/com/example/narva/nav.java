@@ -7,7 +7,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -15,7 +14,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -47,7 +45,6 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
             @Override
             public void onClick(View v) {
                 drawerLayout.openDrawer(GravityCompat.START);
-
             }
         });
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
@@ -61,13 +58,6 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
         Navigation.setViewNavController(navigation,navController);
         EditText field1 = (EditText)findViewById(R.id.search);
         field1.setSelection(0);
-        field1.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                hideNavigationBan();
-                return false;
-            }
-        });
         field1.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -149,25 +139,23 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
         return field1;
     }
 
+
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.tours:
                 getSupportFragmentManager().beginTransaction().replace(R.id.navHostFragment, new Tours()).commit();
-                break;
-            case R.id.leaderboard:
-                Toast.makeText(this,"Sorry but this function is come in next update",Toast.LENGTH_SHORT).show();
+                drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.favourite:
                 getSupportFragmentManager().beginTransaction().replace(R.id.navHostFragment,new Favourite()).commit();
+                drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.tourcode:
                 Toast.makeText(this,"Sorry but this function is come in next update",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.mypoints:
-                Toast.makeText(this,"Sorry but this function is come in next update",Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.help:
                 Toast.makeText(this,"Sorry but this function is come in next update",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.logout:
@@ -178,7 +166,6 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
                 intToMain.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intToMain);
         }
-        drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
     public void hideNavigationBan(){
@@ -227,14 +214,5 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
             return true;
         }
         return super.onKeyDown(keyCode, event);
-    }
-    @Override
-    public void onBackPressed() {
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-            drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else{
-            super.onBackPressed();
-        }
     }
 }

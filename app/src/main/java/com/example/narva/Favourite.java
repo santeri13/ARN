@@ -102,6 +102,7 @@ public class Favourite extends Fragment {
                                     artistList.add(artist);
                                 }
                             }
+                            adapter1.notifyDataSetChanged();
                         }
 
                         @Override
@@ -110,7 +111,6 @@ public class Favourite extends Fragment {
                         }
                     });
                 }
-                adapter1.notifyDataSetChanged();
             }
         }
         @Override

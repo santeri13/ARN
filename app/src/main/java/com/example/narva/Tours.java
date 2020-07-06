@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +31,10 @@ public class Tours extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private DatabaseReference reference;
-    private RecyclerView recyclerView,recyclerView2;
+    private RecyclerView recyclerView;
     private ToursAdapter1 adapter1;
     private ToursAdapter2 adapter2;
+    private ViewPager recyclerView2;
     private List<TourReader1> artistList;
     private List<TourReader2> lovedtours;
     String uid;
@@ -123,14 +126,11 @@ public class Tours extends Fragment {
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), 2);
         recyclerView.setLayoutManager(mGridLayoutManager);
         recyclerView2 = rootview.findViewById(R.id.list);
-        recyclerView2.setHasFixedSize(true);
-        recyclerView2.setLayoutManager(new LinearLayoutManager(getContext()));
         lovedtours = new ArrayList<>();
         adapter2 = new ToursAdapter2(getContext(), lovedtours);
         recyclerView2.setAdapter(adapter2);
         LinearLayoutManager mLinearLayoutManagerHorizontal = new LinearLayoutManager(getContext());
         mLinearLayoutManagerHorizontal.setOrientation(LinearLayoutManager.HORIZONTAL);
-        recyclerView2.setLayoutManager(mLinearLayoutManagerHorizontal);
         return rootview;
     }
 }

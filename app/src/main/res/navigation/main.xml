@@ -15,20 +15,10 @@
         android:label="favourite"
         tools:layout="@layout/favourite" />
     <fragment
-        android:id="@+id/help"
-        android:name="com.example.narva.Help"
-        android:label="help"
-        tools:layout="@layout/help" />
-    <fragment
         android:id="@+id/profile"
         android:name="com.example.narva.Profile"
         android:label="profile"
         tools:layout="@layout/profile" />
-    <fragment
-        android:id="@+id/leaderboard"
-        android:name="com.example.narva.Leaderboards"
-        android:label="leaderboards"
-        tools:layout="@layout/leaderboards" />
     <fragment
         android:id="@+id/tourcode"
         android:name="com.example.narva.Tour_code"

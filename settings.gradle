@@ -1,2 +1,7 @@
 include ':app', ':Rotastion2-debug'
 rootProject.name='N[AR]VA'
+include ':sceneform'
+project(':sceneform').projectDir=new File('sceneformsrc/sceneform')
+
+include ':sceneformux'
+project(':sceneformux').projectDir=new File('sceneformux/ux')

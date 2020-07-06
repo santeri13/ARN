@@ -5,10 +5,6 @@
         android:id="@id/tours"
         android:title="Tours"
         android:icon="@drawable/menu_tours_icnhdpi"/>
-    <item
-        android:id="@id/leaderboard"
-        android:title="Leaderboards"
-        android:icon="@drawable/menu_leader_icnhdpi" />
 
     <item
         android:id="@id/favourite"
@@ -22,10 +18,6 @@
         android:id="@id/tourcode"
         android:title="Tour code"
         android:icon="@drawable/menu_code_icnhdpi"/>
-    <item
-        android:id="@id/help"
-        android:title="Help"
-        android:icon="@drawable/menu_help_icnhdpi"/>
     <item
         android:id="@+id/logout"
         android:title="Logout"

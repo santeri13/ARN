@@ -8,7 +8,6 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -63,8 +62,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,15 +82,14 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
     double end_latitude,end_longtitude;
     TextView textTitle,points;
     DatabaseReference mreference,database,reference;
-    String title,status;
+    String title;
     RecyclerView recyclerView;
     private List<PointReader> artistList;
     private PointAdapter adapter;
     String uid;
-    int pathindicator, pointsofuser;
+    int pathindicator, pointsofuser,Backpresed;
     Dialog dialog,dialog2;
     List<Double> latitudearraylist,longtitudearraylist;
-    Bitmap image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,12 +111,11 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         LinearLayoutManager ilm = new LinearLayoutManager(this){
             @Override
             public boolean canScrollVertically() {
-                return false;
+                return true;
             }
-
             @Override
             public boolean canScrollHorizontally() {
-                return false;
+                return true;
             }
         };
         ilm.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -130,6 +125,7 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         recyclerView.setAdapter(adapter);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         uid = user.getUid();
+        adapter.uid=uid;
         DatabaseReference userpoints  = FirebaseDatabase.getInstance().getReference("user").child(uid);
         ToursRegister registerDatabase = new ToursRegister("undone");
         userpoints.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -187,7 +183,6 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                         Back();
                     }
                 });
-
             }
         });
         TextView textView = findViewById(R.id.meters);
@@ -486,14 +481,9 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
     //Each 2-3 seconds method activate to change information on map.
     @Override
     public void onLocationChanged(Location location) {
-        mLastLocation = location;
-        TextView textView = findViewById(R.id.meters);
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker.remove();
-        }
-
         dialog = adapter.dialog;
         Button next = dialog.findViewById(R.id.next);
+        TextView textView = findViewById(R.id.meters);
 
         if(pathindicator+1 == latitudearraylist.size()){
             next.setText("Finish");
@@ -518,49 +508,46 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
             Log.d("TAG", "latitude" + end_latitude);
             Log.d("TAG", "longtitude" + end_longtitude);
             Log.d("TAG", "pathindicator" + pathindicator);
+            next.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    pathindicator = pathindicator + 1;
+                    adapter.currentnumber = adapter.currentnumber + 1;
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    DatabaseReference userpoints = FirebaseDatabase.getInstance().getReference("user").child(uid).child(title);
+                    userpoints.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            String status = dataSnapshot.child("tours").getValue(String.class);
+                            if (user.isAnonymous()) {
+                                pointsofuser = pointsofuser;
+                            } else if (status.equals("done")) {
+                                pointsofuser = pointsofuser;
+                            } else {
+                                pointsofuser = pointsofuser + 200;
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                    points.setText(Integer.toString(pointsofuser));
+                    if (pathindicator + 1 > latitudearraylist.size()) {
+                        Finishtour(dialog);
+                    } else {
+                        currentmarker = new MarkerOptions().position(new LatLng(end_latitude, end_longtitude));
+                        recyclerView.scrollToPosition(pathindicator);
+                        dialog.dismiss();
+                    }
+                }
+            });
             for (int i = 0, n = result.length; i < n; i++) {
                 textView.setText((int) result[i] + "m");
-                //if(result[i]<=50)
-                next.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        pathindicator = pathindicator + 1;
-                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                        DatabaseReference userpoints  = FirebaseDatabase.getInstance().getReference("user").child(uid).child(title);
-                        userpoints.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                String status = dataSnapshot.child("tours").getValue(String.class);
-                                if(user.isAnonymous()){
-                                    pointsofuser = pointsofuser;
-                                }
-                                else if (status.equals("done")){
-                                    pointsofuser = pointsofuser;
-                                }
-                                else{
-                                    pointsofuser = pointsofuser +200;
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-                        points.setText(Integer.toString(pointsofuser));
-                        if(pathindicator+1 > latitudearraylist.size()){
-                            Finishtour(dialog);
-                        }
-                        else{
-                            currentmarker = new MarkerOptions().position(new LatLng(end_latitude, end_longtitude));
-                            recyclerView.scrollToPosition(pathindicator);
-                            dialog.dismiss();
-                        }
-                    }
-                });
+                adapter.meters = result[i];
             }
         }
-
     }
     private String getUrl(LatLng origin, LatLng dest, String directionMode) {
         // Origin of route
@@ -691,4 +678,15 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
         mMap.animateCamera(cameraUpdate);
     }
-}
+
+    @Override
+    public void onBackPressed() {
+            if(Backpresed ==0){
+                Toast.makeText(getApplicationContext(),"WARNING: All of your progress would not been save", Toast.LENGTH_LONG).show();
+                Backpresed = Backpresed +1;
+            }
+            else{
+                Back();
+            }
+        }
+    }
