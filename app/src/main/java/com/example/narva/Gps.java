@@ -2,6 +2,7 @@ package com.example.narva;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -67,14 +68,12 @@ import java.util.List;
 
 public class Gps extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener,TaskLoadedCallback {
+        LocationListener,TaskLoadedCallback,Scrollinterface {
     private static final int REQUEST_CHECK_SETTINGS = 0x1;
     private static GoogleApiClient mGoogleApiClient;
     private static final int ACCESS_FINE_LOCATION_INTENT_ID = 3;
     private GoogleMap mMap;
     LocationRequest mLocationRequest;
-    Location mLastLocation;
-    Marker mCurrLocationMarker;
     LatLng latLng;
     MarkerOptions lionmarker, markerOptions1,currentmarker;
     private Polyline currentPolyline;
@@ -87,9 +86,15 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
     private List<PointReader> artistList;
     private PointAdapter adapter;
     String uid;
-    int pathindicator, pointsofuser,Backpresed;
-    Dialog dialog,dialog2;
+    int pathindicator, pointsofuser,Backpresed,latitudesize;
+    Dialog dialog;
     List<Double> latitudearraylist,longtitudearraylist;
+    Scrollinterface scrollinterface;
+    private Object Scrollinterface;
+
+    public Gps (){
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +103,7 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         Intent i = getIntent();
         hideNavigationBan();
         pathindicator =0;
-        points = (TextView)findViewById(R.id.points);
+        points = findViewById(R.id.points);
         title = i.getStringExtra("title");
         textTitle = findViewById(R.id.tour_text);
         textTitle.setText(title);
@@ -121,11 +126,14 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         ilm.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(ilm);
         artistList = new ArrayList<>();
-        adapter = new PointAdapter(this,artistList);
+        adapter = new PointAdapter(this,artistList, this);
         recyclerView.setAdapter(adapter);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         uid = user.getUid();
         adapter.uid=uid;
+        adapter.points=points;
+        Context context = getApplicationContext();
+        adapter.context1 = context;
         DatabaseReference userpoints  = FirebaseDatabase.getInstance().getReference("user").child(uid);
         ToursRegister registerDatabase = new ToursRegister("undone");
         userpoints.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -162,6 +170,7 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     Long user1 = dataSnapshot.child("user").child(uid).child("points").getValue(Long.class);
                     pointsofuser = Math.toIntExact(user1);
+                    adapter.pointsofuser = pointsofuser;
                     String user2 = user1.toString().trim();
                     points.setText(user2);
                 }
@@ -389,6 +398,9 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                         }
                     });
                 }
+                latitudesize = latitudearraylist.size();
+                adapter.latitudesize = latitudearraylist.size();
+
             }
 
             @Override
@@ -396,7 +408,6 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
 
             }
         });
-
         mreference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -481,21 +492,13 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
     //Each 2-3 seconds method activate to change information on map.
     @Override
     public void onLocationChanged(Location location) {
+        adapter.latitudesize = latitudearraylist.size();
         dialog = adapter.dialog;
-        Button next = dialog.findViewById(R.id.next);
         TextView textView = findViewById(R.id.meters);
-
-        if(pathindicator+1 == latitudearraylist.size()){
-            next.setText("Finish");
-        }
-
+        adapter.title = title;
         latitude = location.getLatitude();
         longtitude = location.getLongitude();
 
-        if(pathindicator+1 > latitudearraylist.size()){
-            Finishtour(dialog);
-        }
-        else {
             end_latitude = latitudearraylist.get(pathindicator);
             end_longtitude = longtitudearraylist.get(pathindicator);
             //Place current location marker
@@ -508,46 +511,10 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
             Log.d("TAG", "latitude" + end_latitude);
             Log.d("TAG", "longtitude" + end_longtitude);
             Log.d("TAG", "pathindicator" + pathindicator);
-            next.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    pathindicator = pathindicator + 1;
-                    adapter.currentnumber = adapter.currentnumber + 1;
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    DatabaseReference userpoints = FirebaseDatabase.getInstance().getReference("user").child(uid).child(title);
-                    userpoints.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            String status = dataSnapshot.child("tours").getValue(String.class);
-                            if (user.isAnonymous()) {
-                                pointsofuser = pointsofuser;
-                            } else if (status.equals("done")) {
-                                pointsofuser = pointsofuser;
-                            } else {
-                                pointsofuser = pointsofuser + 200;
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                    points.setText(Integer.toString(pointsofuser));
-                    if (pathindicator + 1 > latitudearraylist.size()) {
-                        Finishtour(dialog);
-                    } else {
-                        currentmarker = new MarkerOptions().position(new LatLng(end_latitude, end_longtitude));
-                        recyclerView.scrollToPosition(pathindicator);
-                        dialog.dismiss();
-                    }
-                }
-            });
             for (int i = 0, n = result.length; i < n; i++) {
                 textView.setText((int) result[i] + "m");
                 adapter.meters = result[i];
             }
-        }
     }
     private String getUrl(LatLng origin, LatLng dest, String directionMode) {
         // Origin of route
@@ -641,7 +608,6 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         super.onResume();
         hideNavigationBan();
     }
-
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -651,8 +617,7 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
         Intent intent = new Intent(this, nav.class);
         startActivity(intent);
     }
-    public void Finishtour(Dialog dialog){
-        dialog.dismiss();
+    public void Finishtour(String uid,int pointsofuser){
         dialog.setContentView(R.layout.finish_recycleview);
         dialog.show();
         Button finish = dialog.findViewById(R.id.finish);
@@ -664,7 +629,7 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                     Back();
                 }
                 else{
-                    DatabaseReference userpoints  = FirebaseDatabase.getInstance().getReference("user").child(uid);
+                    DatabaseReference userpoints = FirebaseDatabase.getInstance().getReference("user").child(uid);
                     userpoints.child(title).child("tours").setValue("done");
                     userpoints.child("points").setValue(pointsofuser);
                     userpoints.keepSynced(true);
@@ -689,4 +654,19 @@ public class Gps extends AppCompatActivity implements OnMapReadyCallback, Google
                 Back();
             }
         }
+
+    @Override
+    public void scroll() {
+        pointsofuser = pointsofuser + 5;
+        if (pathindicator + 1 <= latitudesize){
+            Log.d("TAG","asdsadasd");
+            pathindicator = pathindicator +1;
+            recyclerView.scrollToPosition(pathindicator);
+        }
+        if(pathindicator+1 > latitudesize){
+            dialog.dismiss();
+            Finishtour(uid,pointsofuser);
+        }
     }
+}
+

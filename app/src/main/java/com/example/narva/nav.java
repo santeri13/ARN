@@ -139,8 +139,6 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
         return field1;
     }
 
-
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
@@ -168,6 +166,7 @@ public class nav extends AppCompatActivity implements NavigationView.OnNavigatio
         }
         return true;
     }
+
     public void hideNavigationBan(){
         this.getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_FULLSCREEN|
