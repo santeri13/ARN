@@ -73,7 +73,7 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
             @Override
             public void onClick(View v) {
                 pos = tourList.get(holder.getAdapterPosition()).getNumber().intValue();
-                if(pos == currentnumber){
+                if(pos == currentnumber && meters < 50){
                     TextView name = dialog.findViewById(R.id.text_header);
                     TextView text = dialog.findViewById(R.id.hint_text);
                     TextView number = dialog.findViewById(R.id.number);
@@ -142,7 +142,7 @@ public class PointAdapter extends RecyclerView.Adapter<PointAdapter.ToursViewHol
             @Override
             public void onClick(View v) {
                 pos = tourList.get(holder.getAdapterPosition()).getNumber().intValue();
-                if(pos ==currentnumber){
+                if(pos ==currentnumber && meters < 50){
                     TextView name = dialog.findViewById(R.id.text_header);
                     TextView text = dialog.findViewById(R.id.hint_text);
                     TextView number = dialog.findViewById(R.id.number);
